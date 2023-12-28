@@ -12,7 +12,7 @@ It also counts how many times http requests were executed for particular Github 
 ## Steps to set up:
 1. Clone the application 
 ```bash
-git clone https://github.com/coma123/Spring-Boot-Blog-REST-API.git
+git clone https://github.com/tomur96/recruitmenttask.git
 ```
 1. Open Docker on you local machine
 2. Open terminal with the project's path and type:
