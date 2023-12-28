@@ -22,7 +22,7 @@ public class TestUtils {
 
     public static UserEntity sampleUserEntity() {
         UserEntity userEntity = new UserEntity("testuser");
-        userEntity.setApiCallCount(0);
+        userEntity.setRequest_count(0);
         return userEntity;
     }
 }

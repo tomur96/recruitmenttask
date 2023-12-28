@@ -42,7 +42,7 @@ class UserServiceImplTest {
         String username = "testuser";
         GithubUser githubUser = sampleGithubUser();
         UserEntity userEntity = sampleUserEntity();
-        userEntity.setApiCallCount(5);
+        userEntity.setRequest_count(5);
 
         when(restTemplate.getForObject(anyString(), eq(GithubUser.class))).thenReturn(githubUser);
         when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
@@ -75,7 +75,7 @@ class UserServiceImplTest {
         // Arrange
         String username = "testuser";
         UserEntity userEntity = new UserEntity(username);
-        userEntity.setApiCallCount(5);
+        userEntity.setRequest_count(5);
 
         when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 

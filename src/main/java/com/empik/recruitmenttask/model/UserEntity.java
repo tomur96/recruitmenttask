@@ -6,22 +6,22 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash("apicalls")
 public class UserEntity {
         @Id
-        String username;
-        int apiCallCount;
+        String login;
+        int request_count;
 
-        public String getUsername() {
-                return username;
+        public String getLogin() {
+                return login;
         }
 
-        public int getApiCallCount() {
-                return apiCallCount;
+        public int getRequest_count() {
+                return request_count;
         }
 
-        public void setApiCallCount(int apiCallCount) {
-                this.apiCallCount = apiCallCount;
+        public void setRequest_count(int request_count) {
+                this.request_count = request_count;
         }
 
-        public UserEntity(String username) {
-                this.username = username;
+        public UserEntity(String login) {
+                this.login = login;
         }
 }

@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
         GithubUser githubUser = fetchDataFromGithub(username);
 
         UserEntity userEntity = findUser(username);
-        userEntity.setApiCallCount(incrementCallCount(userEntity.getApiCallCount()));
+        userEntity.setRequest_count(incrementCallCount(userEntity.getRequest_count()));
         userRepository.save(userEntity);
 
         double calculations = calculate(githubUser.getFollowers(), githubUser.getPublicRepos());
@@ -48,8 +48,8 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = findUser(username);
 
         return new UserDBStatusResponse(
-                userEntity.getUsername(),
-                userEntity.getApiCallCount()
+                userEntity.getLogin(),
+                userEntity.getRequest_count()
         );
     }
 
