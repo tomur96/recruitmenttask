@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 public class GithubUser {
-
         private final String id;
         private final String login;
         private final String name;
@@ -29,8 +28,6 @@ public class GithubUser {
                 this.followers = followers;
                 this.publicRepos = publicRepos;
         }
-
-        // Gettery (bez setterów, bo to nie record)
 
         public String getId() {
                 return id;
@@ -63,5 +60,4 @@ public class GithubUser {
         public int getPublicRepos() {
                 return publicRepos;
         }
-
 }

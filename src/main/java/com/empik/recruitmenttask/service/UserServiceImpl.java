@@ -1,19 +1,17 @@
 package com.empik.recruitmenttask.service;
 
-import com.empik.recruitmenttask.exception.AppException;
 import com.empik.recruitmenttask.exception.GithubUserNotFoundException;
 import com.empik.recruitmenttask.exception.UserNotFoundException;
 import com.empik.recruitmenttask.model.GithubUser;
 import com.empik.recruitmenttask.model.UserDBStatusResponse;
 import com.empik.recruitmenttask.model.UserResponse;
-import com.empik.recruitmenttask.repository.UserEntity;
+import com.empik.recruitmenttask.model.UserEntity;
 import com.empik.recruitmenttask.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class UserServiceImpl implements UserService {
-
 
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
@@ -25,39 +23,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserInfo(String username) {
-        try {
-            String githubUrl = "https://api.github.com/users/" + username;
-            GithubUser githubUser = restTemplate.getForObject(githubUrl, GithubUser.class);
+        String githubUrl = "https://api.github.com/users/" + username;
+        GithubUser githubUser = restTemplate.getForObject(githubUrl, GithubUser.class);
 
-
-            if (githubUser != null) {
-                UserEntity userEntity = findUser(username);
-
-                userEntity.setApiCallCount(incrementCallCount(userEntity.getApiCallCount()));
-                userRepository.save(userEntity);
-
-                double calculations = calculate(githubUser.getFollowers(), githubUser.getPublicRepos());
-
-                return new UserResponse(
-                        githubUser.getId(),
-                        githubUser.getLogin(),
-                        githubUser.getName(),
-                        githubUser.getType(),
-                        githubUser.getAvatarUrl(),
-                        githubUser.getCreatedAt(),
-                        calculations
-                );
-            } else {
-                throw new GithubUserNotFoundException(username);
-            }
-        } catch (Exception e) {
-            throw new AppException("Error while fetching user data", e);
+        if (githubUser == null) {
+            throw new GithubUserNotFoundException(username);
         }
+
+        UserEntity userEntity = findUser(username);
+        userEntity.setApiCallCount(incrementCallCount(userEntity.getApiCallCount()));
+        userRepository.save(userEntity);
+
+        double calculations = calculate(githubUser.getFollowers(), githubUser.getPublicRepos());
+
+        return new UserResponse(
+                githubUser.getId(),
+                githubUser.getLogin(),
+                githubUser.getName(),
+                githubUser.getType(),
+                githubUser.getAvatarUrl(),
+                githubUser.getCreatedAt(),
+                calculations
+        );
     }
 
     @Override
     public UserDBStatusResponse getDBStatus(String username) {
-
         UserEntity userEntity = findUser(username);
 
         return new UserDBStatusResponse(

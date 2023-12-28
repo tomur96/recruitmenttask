@@ -1,4 +1,4 @@
-package com.empik.recruitmenttask.repository;
+package com.empik.recruitmenttask.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;

@@ -1,79 +1,100 @@
 package com.empik.recruitmenttask;
 
-import com.empik.recruitmenttask.exception.AppException;
+import com.empik.recruitmenttask.exception.GithubUserNotFoundException;
 import com.empik.recruitmenttask.exception.UserNotFoundException;
 import com.empik.recruitmenttask.model.GithubUser;
+import com.empik.recruitmenttask.model.UserDBStatusResponse;
+import com.empik.recruitmenttask.model.UserEntity;
 import com.empik.recruitmenttask.model.UserResponse;
-import com.empik.recruitmenttask.repository.UserEntity;
 import com.empik.recruitmenttask.repository.UserRepository;
-import com.empik.recruitmenttask.service.UserServiceImpl;
+import com.empik.recruitmenttask.service.UserService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
+import static com.empik.recruitmenttask.TestUtils.sampleGithubUser;
+import static com.empik.recruitmenttask.TestUtils.sampleUserEntity;
+import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static com.empik.recruitmenttask.TestUtils.*;
 
 @SpringBootTest
 class UserServiceImplTest {
 
-    private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-    private final UserRepository userRepository = Mockito.mock(UserRepository.class);
-    private final UserServiceImpl userService = new UserServiceImpl(restTemplate, userRepository);
+    @Autowired
+    private UserService userService;
+
+    @MockBean
+    private RestTemplate restTemplate;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
-    void getUserInfo_UserFound_ReturnsUserResponse() {
-        // Arrange  GIVEN
+    void getUserInfo_ok() {
+        // Arrange
         String username = "testuser";
-        String apiUrl = "https://api.github.com/users/" + username;
-
         GithubUser githubUser = sampleGithubUser();
-        when(restTemplate.getForEntity(apiUrl, GithubUser.class))
-                .thenReturn(new ResponseEntity<>(githubUser, HttpStatus.OK));
-
         UserEntity userEntity = sampleUserEntity();
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
-        when(userRepository.findById(username)).thenReturn(java.util.Optional.of(userEntity));
+        userEntity.setApiCallCount(5);
 
-        // Act  WHEN
+        when(restTemplate.getForObject(anyString(), eq(GithubUser.class))).thenReturn(githubUser);
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
+
+        // Act
         UserResponse result = userService.getUserInfo(username);
 
-        // Assert   THEN
+        // Assert
         assertNotNull(result);
-        // Add more assertions based on your specific test data
+        assertEquals("123", result.getId());
+        assertEquals("testuser", result.getLogin());
+        assertEquals("Test User", result.getName());
+        assertEquals("user", result.getType());
+        assertEquals("https://avatar.url", result.getAvatarUrl());
     }
 
     @Test
-    void getUserInfo_UserNotFound_ThrowsUserNotFoundException() {
-        // GIVEN
+    void getUserInfo_GithubUserNotFoundException() {
+        // Arrange
         String username = "nonexistentuser";
-        String apiUrl = "https://api.github.com/users/" + username;
 
-        // WHEN
-        when(restTemplate.getForEntity(apiUrl, GithubUser.class))
-                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+        when(restTemplate.getForObject(anyString(), eq(GithubUser.class))).thenReturn(null);
 
-        // THEN
-        assertThrows(UserNotFoundException.class, () -> userService.getUserInfo(username));
+        // Assert
+        assertThrows(GithubUserNotFoundException.class, () -> userService.getUserInfo(username));
     }
 
     @Test
-    void getUserInfo_GeneralError_ThrowsUserServiceException() {
-        // GIVEN
+    void getDBStatus_ok() {
+        // Arrange
         String username = "testuser";
-        String apiUrl = "https://api.github.com/users/" + username;
+        UserEntity userEntity = new UserEntity(username);
+        userEntity.setApiCallCount(5);
 
-        // WHEN
-        when(restTemplate.getForEntity(apiUrl, GithubUser.class))
-                .thenThrow(new RuntimeException("Some unexpected error"));
+        when(userRepository.findById(username)).thenReturn(Optional.of(userEntity));
 
-        // THEN
-        assertThrows(AppException.class, () -> userService.getUserInfo(username));
+        // Act
+        UserDBStatusResponse result = userService.getDBStatus(username);
+
+        // Assert
+        assertEquals(username, result.username());
+        assertEquals(5, result.apiCallCount());
+    }
+
+    @Test
+    void getDBStatus_UserNotFoundException() {
+        // Arrange
+        String username = "nonexistentuser";
+
+        when(userRepository.findById(username)).thenReturn(empty());
+
+        // Assert
+        assertThrows(UserNotFoundException.class, () -> userService.getDBStatus(username));
     }
 }

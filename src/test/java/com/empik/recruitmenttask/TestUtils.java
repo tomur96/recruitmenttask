@@ -1,7 +1,7 @@
 package com.empik.recruitmenttask;
 
 import com.empik.recruitmenttask.model.GithubUser;
-import com.empik.recruitmenttask.repository.UserEntity;
+import com.empik.recruitmenttask.model.UserEntity;
 
 import java.util.Date;
 
@@ -13,7 +13,7 @@ public class TestUtils {
                 "testuser",
                 "Test User",
                 "user",
-                "https://example.com/avatar.png",
+                "https://avatar.url",
                 new Date(),
                 100,
                 20
