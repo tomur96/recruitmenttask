@@ -2,10 +2,8 @@ package com.empik.recruitmenttask.controller;
 
 import com.empik.recruitmenttask.model.UserDBStatusResponse;
 import com.empik.recruitmenttask.model.UserResponse;
-import com.empik.recruitmenttask.repository.UserRepository;
 import com.empik.recruitmenttask.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +25,7 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserInfo(@PathVariable("username") String username) {
         UserResponse userResponse = userService.getUserInfo(username);
 
-        return ResponseEntity.ok(userResponse); //TODO add exception handling
+        return ResponseEntity.ok(userResponse);
     }
 
 //    helper endpoint for fetching DB data
@@ -35,6 +33,6 @@ public class UserController {
     public ResponseEntity<UserDBStatusResponse> getDBStatus(@PathVariable("username") String username) {
         UserDBStatusResponse userResponse = userService.getDBStatus(username);
 
-        return ResponseEntity.ok(userResponse); //TODO add exception handling
+        return ResponseEntity.ok(userResponse);
     }
 }
