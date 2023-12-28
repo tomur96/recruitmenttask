@@ -8,6 +8,7 @@ import com.empik.recruitmenttask.model.UserResponse;
 import com.empik.recruitmenttask.model.UserEntity;
 import com.empik.recruitmenttask.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -23,12 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserInfo(String username) {
-        String githubUrl = "https://api.github.com/users/" + username;
-        GithubUser githubUser = restTemplate.getForObject(githubUrl, GithubUser.class);
-
-        if (githubUser == null) {
-            throw new GithubUserNotFoundException(username);
-        }
+        GithubUser githubUser = fetchDataFromGithub(username);
 
         UserEntity userEntity = findUser(username);
         userEntity.setApiCallCount(incrementCallCount(userEntity.getApiCallCount()));
@@ -45,6 +41,16 @@ public class UserServiceImpl implements UserService {
                 githubUser.getCreatedAt(),
                 calculations
         );
+    }
+
+    private GithubUser fetchDataFromGithub(String username) {
+        try {
+            String githubUrl = "https://api.github.com/users/" + username;
+            return restTemplate.getForObject(githubUrl, GithubUser.class);
+        } catch (HttpClientErrorException e) {
+            throw new GithubUserNotFoundException(username);
+        }
+
     }
 
     @Override
