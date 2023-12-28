@@ -43,16 +43,6 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-    private GithubUser fetchDataFromGithub(String username) {
-        try {
-            String githubUrl = "https://api.github.com/users/" + username;
-            return restTemplate.getForObject(githubUrl, GithubUser.class);
-        } catch (HttpClientErrorException e) {
-            throw new GithubUserNotFoundException(username);
-        }
-
-    }
-
     @Override
     public UserDBStatusResponse getDBStatus(String username) {
         UserEntity userEntity = findUser(username);
@@ -61,6 +51,21 @@ public class UserServiceImpl implements UserService {
                 userEntity.getUsername(),
                 userEntity.getApiCallCount()
         );
+    }
+
+    private GithubUser fetchDataFromGithub(String username) {
+        try {
+            String githubUrl = "https://api.github.com/users/" + username;
+            GithubUser githubUser = restTemplate.getForObject(githubUrl, GithubUser.class);
+
+            if (githubUser == null) {
+                throw new GithubUserNotFoundException(username);
+            } else
+                return githubUser;
+
+        } catch (HttpClientErrorException e) {
+            throw new GithubUserNotFoundException(username);
+        }
     }
 
     private UserEntity findUser(String username) {

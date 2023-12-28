@@ -83,8 +83,8 @@ class UserServiceImplTest {
         UserDBStatusResponse result = userService.getDBStatus(username);
 
         // Assert
-        assertEquals(username, result.username());
-        assertEquals(5, result.apiCallCount());
+        assertEquals(username, result.getUsername());
+        assertEquals(5, result.getApiCallCount());
     }
 
     @Test

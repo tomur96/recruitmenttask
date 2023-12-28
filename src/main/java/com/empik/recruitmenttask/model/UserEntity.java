@@ -17,10 +17,6 @@ public class UserEntity {
                 return apiCallCount;
         }
 
-        public void setUsername(String username) {
-                this.username = username;
-        }
-
         public void setApiCallCount(int apiCallCount) {
                 this.apiCallCount = apiCallCount;
         }
